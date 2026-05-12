@@ -135,7 +135,16 @@ private:
    * @return true se player1 tiver maior prioridade que player2.
    * @return false caso contrário (se player2 tiver maior ou igual prioridade).
    */
-  bool comparePlayers(Player *player1, Player *player2);
+  bool comparePlayers(Player *player1, Player *player2){
+    int score1 = player1->getScore();
+    int score2 = player2->getScore();
+    if(score1 != score2){
+      return score1 < score2;
+    }
+    if(score1 = score2){
+      return player1->getTimeStamp() < player2-> getTimeStamp();
+    }
+  }
 
   // Outros métodos auxiliares, se necessário
 };
