@@ -22,8 +22,14 @@ public:
    * sucesso.
    * @return false se a capacidade máxima (MAX_PLAYERS) já tiver sido atingida.
    */
-  bool insert(Player player);
-
+  bool insert(Player player) {
+    if(size >= MAX_PLAYERS){
+      return false;
+    }
+    players[size] = player;
+    size ++;
+    return true;
+  }
   /**
    * @brief Remove um jogador específico da fila de espera.
    *
