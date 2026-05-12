@@ -10,6 +10,26 @@ private:
   Player players[MAX_PLAYERS];
   int size;
 
+
+    /**
+   * @brief Compara a prioridade entre dois jogadores.
+   *
+   * Avalia qual dos dois jogadores deve ter preferência na ordenação.
+   * Seguindo as regras do sistema, a maior prioridade geralmente pertence ao
+   * jogador com o menor score e, em caso de empate, ao jogador com o menor
+   * timestamp.
+   *
+   * @param player1 Ponteiro para o primeiro jogador a ser comparado.
+   * @param player2 Ponteiro para o segundo jogador a ser comparado.
+   * @return true se player1 tiver maior prioridade que player2.
+   * @return false caso contrário (se player2 tiver maior ou igual prioridade).
+   */
+  bool comparePlayers(Player *player1, Player *player2);
+
+  
+  void merge(Player* arr, int left, int mid, int right);
+  void mergeSortHelper(Player* arr, int left, int right);
+
 public:
   Matchmaking();
   ~Matchmaking();
@@ -22,14 +42,7 @@ public:
    * sucesso.
    * @return false se a capacidade máxima (MAX_PLAYERS) já tiver sido atingida.
    */
-  bool insert(Player player) {
-    if(size >= MAX_PLAYERS){
-      return false;
-    }
-    players[size] = player;
-    size ++;
-    return true;
-  }
+  bool insert(Player player) {};
   /**
    * @brief Remove um jogador específico da fila de espera.
    *
@@ -37,18 +50,7 @@ public:
    * @return true se o jogador foi encontrado e removido com sucesso.
    * @return false caso nenhum jogador com o ID informado seja encontrado.
    */
-  bool Matchmaking::removePlayer(int id){
-    for(int i = 0; i<= size-1; i++){
-      if(players[i].getId() == id){
-        for(int j =i; j<=size-2; j++){
-          players[j] = players[j+1];
-        }
-        size --;
-        return true;
-      }
-    }
-    return false;
-  }
+  bool removePlayer(int id){}
 
   /**
    * @brief Ordena os jogadores por score em ordem crescente utilizando o
@@ -58,18 +60,7 @@ public:
    * (vem primeiro).
    * @note Este algoritmo possui custo quadrático (O(n²)) no pior caso.
    */
-  void Matchmaking::sortByScoreInsertion(){
-    for(int i=1; i<size; i++){
-      Player key = players[i];
-      int j=i-1;
-
-      while(j>=0 && comparePlayers(&key, &players[j])){
-        players[j+1] = players[j];
-        j--;
-      }
-      players[j+1] = key;
-      } 
-    }
+  void Matchmaking::sortByScoreInsertion(){}
 
   /**
    * @brief Ordena os jogadores por score em ordem crescente utilizando o
@@ -80,9 +71,7 @@ public:
    * @note Estratégia baseada em divisão e conquista, possuindo custo de tempo
    * O(n log n) no pior caso.
    */
-  void Matchmaking::sortByScoreMerge(){
-    
-  }
+  void Matchmaking::sortByScoreMerge(){}
 
   /**
    * @brief Tenta formar um grupo com a quantidade especificada de jogadores.
@@ -121,7 +110,7 @@ public:
    * A saída inclui a identificação "Waiting Players". Caso não existam
    * jogadores armazenados, exibe a indicação "(empty)".
    */
-  void Matchmaking::printWaitingPlayers();
+  void printWaitingPlayers();
 
   /**
    * @brief Imprime o conteúdo de um array de jogadores.
@@ -132,32 +121,7 @@ public:
    * @param players Ponteiro para o array de objetos Player a ser exibido.
    * @param size A quantidade de jogadores contidos no array.
    */
-  void Matchmaking::printPlayers(Player *players, int size);
-
-private:
-  /**
-   * @brief Compara a prioridade entre dois jogadores.
-   *
-   * Avalia qual dos dois jogadores deve ter preferência na ordenação.
-   * Seguindo as regras do sistema, a maior prioridade geralmente pertence ao
-   * jogador com o menor score e, em caso de empate, ao jogador com o menor
-   * timestamp.
-   *
-   * @param player1 Ponteiro para o primeiro jogador a ser comparado.
-   * @param player2 Ponteiro para o segundo jogador a ser comparado.
-   * @return true se player1 tiver maior prioridade que player2.
-   * @return false caso contrário (se player2 tiver maior ou igual prioridade).
-   */
-  bool Matchmaking::comparePlayers(Player *player1, Player *player2){
-    int score1 = player1->getScore();
-    int score2 = player2->getScore();
-    if(score1 != score2){
-      return score1 < score2;
-    }
-    if(score1 = score2){
-      return player1->getTimeStamp() < player2->getTimeStamp();
-    }
-  }
+  void printPlayers(Player *players, int size);
 
   // Outros métodos auxiliares, se necessário
 };
