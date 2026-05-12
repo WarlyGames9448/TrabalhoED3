@@ -80,7 +80,9 @@ public:
    * @note Estratégia baseada em divisão e conquista, possuindo custo de tempo
    * O(n log n) no pior caso.
    */
-  void Matchmaking::sortByScoreMerge();
+  void Matchmaking::sortByScoreMerge(){
+    
+  }
 
   /**
    * @brief Tenta formar um grupo com a quantidade especificada de jogadores.
