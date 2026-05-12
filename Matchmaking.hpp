@@ -37,7 +37,18 @@ public:
    * @return true se o jogador foi encontrado e removido com sucesso.
    * @return false caso nenhum jogador com o ID informado seja encontrado.
    */
-  bool removePlayer(int id);
+  bool removePlayer(int id){
+    for(int i = 0; i<= size-1; i++){
+      if(players[i].getId() == id){
+        for(int j =i; j<=size-2; j++){
+          players[j] = players[j+1];
+        }
+        size --;
+        return true;
+      }
+    }
+    return false;
+  }
 
   /**
    * @brief Ordena os jogadores por score em ordem crescente utilizando o
