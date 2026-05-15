@@ -1,5 +1,7 @@
 #include "Matchmaking.hpp"
 
+#include <iostream>
+
 Matchmaking::Matchmaking() { size = 0; }
 
 Matchmaking::~Matchmaking() {}
@@ -47,25 +49,26 @@ void Matchmaking::sortByScoreInsertion() {
     }
 }
 
-void Matchmaking::merge(Player* arr, int left, int mid, int right) {
-    int left_size = mid - left + 1;
-    int right_size = right - mid;
+void Matchmaking::merge(Player* arr, int n) {
+    int mid = n / 2;
+    if (n <= 1) return;
 
-    Player* left_part = new Player[left_size];
-    Player* right_part = new Player[right_size];
-
-    for (int i = left, j = 0; i <= mid; i++, j++) {
-        left_part[j] = arr[i];
+    Player* left_part = new Player[mid];
+    for (int index = 0; index < mid; index++) {
+        left_part[index] = arr[index];
     }
-    for (int i = mid + 1, j = 0; i <= right; i++, j++) {
-        right_part[j] = arr[i];
+    Player* right_part = new Player[n - mid];
+    for (int index = 0; index < n - mid; index++) {
+        right_part[index] = arr[index + mid];
     }
+    merge(left_part, mid);
+    merge(right_part, n - mid);
 
-    int i = 0;    // percorrer esquerda
-    int j = 0;    // percorrer a direita
-    int k = left; // percorrer o array original
+    int i = 0; // percorrer esquerda
+    int j = 0; // percorrer a direita
+    int k = 0; // percorrer o array original
 
-    while (i < left_size && j < right_size) {
+    while (i < mid && j < n - mid) {
         if (comparePlayers(left_part[i], right_part[j])) {
             arr[k] = left_part[i];
             i++;
@@ -77,12 +80,12 @@ void Matchmaking::merge(Player* arr, int left, int mid, int right) {
     }
 
     // caso tenha sobrado algum jogador auxiliar (se um acabou antes), copia-se para o original
-    while (i < left_size) {
+    while (i < mid) {
         arr[k] = left_part[i];
         i++;
         k++;
     }
-    while (j < right_size) {
+    while (j < n - mid) {
         arr[k] = right_part[j];
         j++;
         k++;
@@ -92,24 +95,76 @@ void Matchmaking::merge(Player* arr, int left, int mid, int right) {
     delete[] right_part;
 }
 
-void Matchmaking::mergeSortHelper(Player* arr, int left, int right) {
-    if (left >= right) return;
+void Matchmaking::sortByScoreMerge() { merge(players, size); }
 
-    int mid = left + (right - left) / 2;
-    mergeSortHelper(arr, left, mid);
-    mergeSortHelper(arr, mid + 1, right);
-    merge(arr, left, mid, right);
+Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
+    *n = 0;
+    if (groupSize > size) return nullptr;
+
+    int i = 0;
+    int j = groupSize - 1;
+
+    while (j < size) {
+        if (this->players[j].getScore() - this->players[i].getScore() <= delta) {
+            // Cria novo array
+            *n = groupSize;
+            Player* group = new Player[groupSize];
+            for (int index = 0; index < groupSize; index++)
+                group[index] = this->players[i + index];
+
+            // Deleta-os da lista.
+
+            for (int k = 0; k < size - j - 1; k++) {
+                this->players[i + k] = this->players[j + k + 1];
+            }
+
+            size -= groupSize;
+            return group;
+        }
+
+        i++;
+        j++;
+    }
+
+    // Não encontrou grupo
+    return nullptr;
 }
 
-void Matchmaking::sortByScoreMerge() {
-    if (size > 1) {
-        mergeSortHelper(players, 0, size - 1);
+Player* Matchmaking::getWaitingPlayers(int* n) {
+    *n = this->size;
+
+    Player* waitingPlayers = new Player[this->size];
+    for (int index = 0; index < this->size; index++)
+        waitingPlayers[index] = this->players[index];
+
+    return waitingPlayers;
+}
+
+void Matchmaking::printWaitingPlayers() {
+    std::cout << "Waiting Players:" << std::endl;
+
+    if (this->size == 0) {
+        std::cout << "(empty)" << std::endl;
+        return;
+    }
+
+    for (int index = 0; index < this->size; index++) {
+        std::cout << "[" << this->players[index].getId() << " | " << this->players[index].getName() << " | "
+                  << this->players[index].getScore() << " | " << this->players[index].getTimestamp() << "]"
+                  << std::endl;
     }
 }
 
-Player* Matchmaking::formGroup(int groupSize, int delta, int* n) { return nullptr; }
-Player* Matchmaking::getWaitingPlayers(int* n) { return nullptr; }
+void Matchmaking::printPlayers(Player* players, int size, const char* type) {
+    std::cout << type << std::endl;
 
-void Matchmaking::printWaitingPlayers() {}
+    if (size == 0) {
+        std::cout << "(empty)" << std::endl;
+        return;
+    }
 
-void Matchmaking::printPlayers(Player* players, int size) {}
+    for (int index = 0; index < size; index++) {
+        std::cout << "[" << players[index].getId() << " | " << players[index].getName() << " | "
+                  << players[index].getScore() << " | " << players[index].getTimestamp() << "]" << std::endl;
+    }
+}

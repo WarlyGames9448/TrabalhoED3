@@ -2,12 +2,14 @@
 
 #include "Player.hpp"
 
-const int MAX_PLAYERS = 100000;
+// Tornado estático para usar na criação do Player
+static const int MAX_PLAYERS = 100000;
 
 class Matchmaking {
 
   private:
-    Player players[MAX_PLAYERS];
+    // Alocação dinâmica para utilizar a lógica de ponteiros sem erros.
+    Player* players = new Player[MAX_PLAYERS];
     int size;
 
   private:
@@ -26,8 +28,19 @@ class Matchmaking {
      */
     bool comparePlayers(const Player& player1, const Player& player2);
 
-    void merge(Player* arr, int left, int mid, int right);
-    void mergeSortHelper(Player* arr, int left, int right);
+    /**
+     * @brief CMétodo auxiliar para o sortByScoreMerge()
+     *
+     *
+     * @param arr Ponteiro para um elemento de players.
+     * @param n tamanho da sublista, isto é, pega n consecutivos de players, onde o primeiro deles está sendo apontado
+     * por arr.
+     * @return Ponteiro para a lista ordenada
+     *
+     * @note Não é criado nenhuma lista auxiliar, todas as operações são feitas dentro da original
+     * Portanto, deve-se passar um cópia de players.
+     */
+    void merge(Player* arr, int n);
 
   public:
     Matchmaking();
@@ -120,8 +133,7 @@ class Matchmaking {
      *
      * @param players Ponteiro para o array de objetos Player a ser exibido.
      * @param size A quantidade de jogadores contidos no array.
+     * @param type A mensagem a ser imprimida na primeira linha.
      */
-    void printPlayers(Player* players, int size);
-
-    // Outros métodos auxiliares, se necessário
+    void printPlayers(Player* players, int size, const char* type);
 };
