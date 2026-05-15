@@ -4,7 +4,7 @@
 
 Matchmaking::Matchmaking() { size = 0; }
 
-Matchmaking::~Matchmaking() {}
+Matchmaking::~Matchmaking() { delete[] this->players; }
 
 bool Matchmaking::comparePlayers(const Player& player1, const Player& player2) {
     int score1 = player1.getScore();
@@ -39,63 +39,73 @@ bool Matchmaking::removePlayer(int id) {
 
 void Matchmaking::sortByScoreInsertion() {
     for (int i = 1; i < size; i++) {
+        Player key = players[i];
         int j = i - 1;
 
-        while (j >= 0 && comparePlayers(players[i], players[j])) {
+        // passa todo os players maiores que a 'key' para frente
+        while (j >= 0 && comparePlayers(key, players[j])) {
             players[j + 1] = players[j];
             j--;
         }
-        players[j + 1] = players[i];
+        players[j + 1] = key;
     }
 }
 
-void Matchmaking::merge(Player* arr, int n) {
-    int mid = n / 2;
-    if (n <= 1) return;
-
-    Player* left_part = new Player[mid];
-    for (int index = 0; index < mid; index++) {
-        left_part[index] = arr[index];
+void Matchmaking::mergeSortAux(Player* arr, Player* temp, int left, int right) {
+    if (left >= right) {
+        return;
     }
-    Player* right_part = new Player[n - mid];
-    for (int index = 0; index < n - mid; index++) {
-        right_part[index] = arr[index + mid];
-    }
-    merge(left_part, mid);
-    merge(right_part, n - mid);
 
-    int i = 0; // percorrer esquerda
-    int j = 0; // percorrer a direita
-    int k = 0; // percorrer o array original
+    int mid = left + (right - left) / 2;
 
-    while (i < mid && j < n - mid) {
-        if (comparePlayers(left_part[i], right_part[j])) {
-            arr[k] = left_part[i];
+    mergeSortAux(arr, temp, left, mid);
+    mergeSortAux(arr, temp, mid + 1, right);
+
+    merge(arr, temp, left, mid, right);
+}
+
+void Matchmaking::merge(Player* arr, Player* temp, int left, int mid, int right) {
+    int i = left;
+    int j = mid + 1;
+    int k = left;
+
+    while (i <= mid && j <= right) {
+        if (comparePlayers(arr[i], arr[j])) {
+            temp[k] = arr[i];
             i++;
         } else {
-            arr[k] = right_part[j];
+            temp[k] = arr[j];
             j++;
         }
         k++;
     }
 
-    // caso tenha sobrado algum jogador auxiliar (se um acabou antes), copia-se para o original
-    while (i < mid) {
-        arr[k] = left_part[i];
+    while (i <= mid) {
+        temp[k] = arr[i];
         i++;
         k++;
     }
-    while (j < n - mid) {
-        arr[k] = right_part[j];
+    while (j <= right) {
+        temp[k] = arr[j];
         j++;
         k++;
     }
 
-    delete[] left_part;
-    delete[] right_part;
+    for (int p = left; p <= right; p++) {
+        arr[p] = temp[p];
+    }
 }
 
-void Matchmaking::sortByScoreMerge() { merge(players, size); }
+void Matchmaking::sortByScoreMerge() {
+    if (size <= 1) return;
+
+    // temporário a ser usado no mergeSortAux
+    Player* temp = new Player[size];
+
+    mergeSortAux(players, temp, 0, size - 1);
+
+    delete[] temp;
+}
 
 Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
     *n = 0;
@@ -113,7 +123,6 @@ Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
                 group[index] = this->players[i + index];
 
             // Deleta-os da lista.
-
             for (int k = 0; k < size - j - 1; k++) {
                 this->players[i + k] = this->players[j + k + 1];
             }

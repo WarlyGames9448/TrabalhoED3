@@ -1,48 +1,100 @@
+#include <iostream>
 #include "Matchmaking.hpp"
 #include "Player.hpp"
 
-#include <iostream>
-
 int main() {
-  Matchmaking sys;
+    std::cout << "========================================\n";
+    std::cout << "   INICIANDO TESTES DO MATCHMAKING\n";
+    std::cout << "========================================\n\n";
 
-  sys.insert({1, "Ana", 1000, 3});
-  sys.insert({2, "Bruno", 900, 2});
-  sys.insert({3, "Carla", 1100, 1});
+    Matchmaking mm;
 
-  if (sys.insert({4, "Maranhão", 800, 4}))
-    std::cout << "Maranhão foi adicionado!" << std::endl;
+    Player p1(1, "Alice", 1500, 100);
+    Player p2(2, "Bob", 1600, 110);
+    Player p3(3, "Carol", 1500, 50); // Empate
+    Player p4(4, "Dave", 1400, 120);
+    Player p5(5, "Eve", 1550, 130);
+    Player p6(6, "Frank", 1560, 140);
+    Player p7(7, "Grace", 1800, 150);
 
-  sys.printWaitingPlayers();
+    std::cout << "--- 1. INSERCAO DE JOGADORES ---\n";
+    mm.insert(p1);
+    mm.insert(p2);
+    mm.insert(p3);
+    mm.insert(p4);
+    mm.insert(p5);
+    mm.insert(p6);
+    mm.insert(p7);
 
-  std::cout << "\n===================== Ordenando ===================\n";
+    mm.printWaitingPlayers();
+    std::cout << "\n";
 
-  sys.sortByScoreMerge();
-  sys.printWaitingPlayers();
+    std::cout << "--- 2. REMOCAO DE JOGADORES ---\n";
+    std::cout << "Tentando remover Bob (ID 2)...\n";
+    if (mm.removePlayer(2)) {
+        std::cout << "Jogador removido com sucesso!\n";
+    }
+    mm.printWaitingPlayers();
+    std::cout << "\n";
 
-  std::cout << "\n===================== Com Empate ===================\n";
+    std::cout << "--- 3. ORDENACAO UTILIZANDO INSERTION SORT (COM EMPATE) ---\n";
+    std::cout << "Ordenando...\n";
+    mm.sortByScoreInsertion();
 
-  sys.insert({5, "Zé", 900, 5});
-  sys.sortByScoreMerge();
-  sys.printWaitingPlayers();
+    mm.printWaitingPlayers();
+    std::cout << "\n";
 
-  std::cout << "\n===================== Formação de Grupos ===================\n";
+    std::cout << "--- 4. ORDENACAO UTILIZANDO MERGE SORT ---\n";
+    std::cout << "Para testar, vamos desordenar inserindo um novo jogador com score baixo.\n";
+    Player p8(8, "Heidi", 1300, 160);
+    mm.insert(p8);
+    std::cout << "Estado antes do Merge Sort:\n";
+    mm.printWaitingPlayers();
 
-  int n;
-  Player *group = sys.formGroup(3, 150, &n);
-  sys.printPlayers(group, n, "Group:");
+    std::cout << "\nAplicando Merge Sort...\n";
+    mm.sortByScoreMerge();
+    mm.printWaitingPlayers();
+    std::cout << "\n";
 
-  // Nenhuma formação de grupo possível
-  Player *group2 = sys.formGroup(3, 10, &n);
-  sys.printPlayers(group2, n,"Group:");
+    std::cout << "--- 5. TENTATIVA DE FORMACAO DE GRUPO SEM SUCESSO ---\n";
+    int n;
+    Player* failGroup = nullptr;
+    std::cout << "Tentando formar grupo de 3 com delta de 10...\n";
+    failGroup = mm.formGroup(3, 10, &n);
 
-  std::cout << "\n===================== Removendo Players ===================\n";
-  if(sys.removePlayer(3)) std::cout << "Player com id 3 removido!\n";
-  sys.printWaitingPlayers();
+    if (failGroup == nullptr) {
+        std::cout << "Resultado: Nenhum grupo formado. (Retornou nullptr)\n";
+    }
+    std::cout << "\n";
 
-  std::cout << "\n===================== Metodo get ===================\n";
-  Player* players = sys.getWaitingPlayers(&n);
-  sys.printPlayers(players, n, "Waiting Players:");
+    std::cout << "--- 6. FORMACAO BEM-SUCEDIDA DE GRUPO ---\n";
+    Player* successGroup = nullptr;
+    std::cout << "Tentando formar grupo de 3 com delta de 50...\n";
+    successGroup = mm.formGroup(3, 50, &n);
 
-  return 0;
+    if (successGroup != nullptr) {
+        std::cout << "Grupo formado com sucesso! Jogadores no grupo:\n";
+        mm.printPlayers(successGroup, n, "Group:");
+        delete[] successGroup; // Liberando a memoria
+    }
+
+    std::cout << "\nEstado da fila apos formar o grupo (jogadores devem ter sido removidos):\n";
+    mm.printWaitingPlayers();
+    std::cout << "\n";
+
+    std::cout << "--- 7. RECUPERACAO DE DADOS VIA getWaitingPlayers ---\n";
+    int waitingCount = 0;
+    Player* waitingList = mm.getWaitingPlayers(&waitingCount);
+
+    if (waitingList != nullptr) {
+        mm.printPlayers(waitingList, waitingCount, "Jogadores recuperados em um novo array dinamico:");
+        delete[] waitingList; // Liberando a memoria
+    } else {
+        std::cout << "A fila esta vazia.\n";
+    }
+    std::cout << "\n========================================\n";
+    std::cout << "           FIM DOS TESTES\n";
+    std::cout << "========================================\n";
+
+    return 0;
 }

@@ -29,18 +29,33 @@ class Matchmaking {
     bool comparePlayers(const Player& player1, const Player& player2);
 
     /**
-     * @brief CMétodo auxiliar para o sortByScoreMerge()
+     * @brief Função principal recursiva do algoritmo Merge Sort.
      *
+     * Divide o array sucessivamente em metades menores até que atinjam o tamanho
+     * base de 1 elemento. Em seguida, chama o método merge para fundir essas metades.
      *
-     * @param arr Ponteiro para um elemento de players.
-     * @param n tamanho da sublista, isto é, pega n consecutivos de players, onde o primeiro deles está sendo apontado
-     * por arr.
-     * @return Ponteiro para a lista ordenada
-     *
-     * @note Não é criado nenhuma lista auxiliar, todas as operações são feitas dentro da original
-     * Portanto, deve-se passar um cópia de players.
+     * @param arr Ponteiro para o array original de jogadores que está sendo ordenado.
+     * @param temp Ponteiro para o array dinâmico temporário pré-alocado.
+     * @param left Índice inicial (limite esquerdo) do subarray atual a ser processado.
+     * @param right Índice final (limite direito) do subarray atual a ser processado.
      */
-    void merge(Player* arr, int n);
+    void mergeSortAux(Player* arr, Player* temp, int left, int right);
+
+    /**
+     * @brief Funde duas metades contíguas e já ordenadas do array.
+     *
+     * Compara os jogadores da metade esquerda (left até mid) com os da metade direita
+     * (mid + 1 até right) utilizando o critério de prioridade do sistema (comparePlayers).
+     * Os elementos são organizados sequencialmente no array temporário e, ao término,
+     * a porção ordenada é copiada de volta para o array original na sua respectiva faixa.
+     *
+     * @param arr Ponteiro para o array original de jogadores.
+     * @param temp Ponteiro para o array dinâmico temporário pré-alocado.
+     * @param left Índice inicial da metade esquerda.
+     * @param mid Índice final da metade esquerda.
+     * @param right Índice final da metade direita.
+     */
+    void merge(Player* arr, Player* temp, int left, int mid, int right);
 
   public:
     Matchmaking();
