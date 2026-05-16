@@ -109,7 +109,7 @@ void Matchmaking::sortByScoreMerge() {
 
 Player* Matchmaking::formGroup(int groupSize, int delta, int* n) {
     *n = 0;
-    if (groupSize > size) return nullptr;
+    if (groupSize <= 0 || groupSize > size) return nullptr;
 
     int i = 0;
     int j = groupSize - 1;
